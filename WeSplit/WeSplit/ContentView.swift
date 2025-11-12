@@ -52,8 +52,16 @@ struct ContentView: View {
                 }
                 
                 Section {
+                    HStack {
+                        
+                    
                     Text(totalPerPerson, format: .currency(code: Locale.current.currency?.identifier ?? "USD"))
+                        .background(tipPercentage == 0 ? Color.red : Color.white)
+                        Spacer()
                 }
+                }
+                .padding(0)
+                .background(tipPercentage == 0 ? Color.red : Color.white)
             }
             .navigationTitle("WeSplit")
             .toolbar {
