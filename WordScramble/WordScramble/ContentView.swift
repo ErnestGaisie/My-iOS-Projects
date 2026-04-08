@@ -17,6 +17,8 @@ struct ContentView: View {
     @State private var errorMessage = ""
     @State private var showingError = false
     
+    @State private var score = 0
+    
     var body: some View {
         NavigationStack {
             List {
@@ -26,6 +28,8 @@ struct ContentView: View {
                 }
                 
                 Section {
+                    Text("Score: \(score)")
+                    
                     ForEach(usedWords, id: \.self) { word in
                         HStack {
                             Image(systemName: "\(word.count).circle")
@@ -34,6 +38,7 @@ struct ContentView: View {
                         
                     }
                 }
+                
             }
             .navigationTitle(rootWord)
             .onSubmit(addNewWord)
@@ -42,6 +47,12 @@ struct ContentView: View {
                 Button("OK") { }
             } message: {
                 Text(errorMessage)
+            }
+            .toolbar {
+                Button("Restart") {
+                    startGame()
+                }
+                    .padding(4)
             }
         }
     }
@@ -67,9 +78,15 @@ struct ContentView: View {
             return
         }
         
+        guard isGreaterThan3(word: answer) else {
+            wordError(title: "Word is less than 3", message: "Cmon, make it longer")
+            return
+        }
+        
         withAnimation
         {
             usedWords.insert(answer, at: 0)
+            calculateScore(count: answer.count)
         }
         newWord = ""
     }
@@ -85,7 +102,7 @@ struct ContentView: View {
         
         fatalError("Could not load start.txt from bundle.")
     }
-    
+        
     func isOriginal(word: String) -> Bool {
         !usedWords.contains(word)
     }
@@ -110,11 +127,26 @@ struct ContentView: View {
         return misspelledRange.location == NSNotFound
     }
     
+    func isGreaterThan3(word: String) -> Bool {
+        guard word.count > 2 else {
+            return false
+        }
+    
+        return true
+    }
+    
+    func calculateScore(count: Int) {
+        score += count
+    }
+
+    
     func wordError(title: String, message: String) {
         errorMessage = title
         errorMessage = message
         showingError = true
     }
+    
+    
 }
 
 #Preview {
