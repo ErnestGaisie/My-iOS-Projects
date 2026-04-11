@@ -19,6 +19,11 @@ struct ContentView: View {
     @State private var currentQuestion = 1
     @State private var showingFinalScore = false
     
+    @State private var tappedQueestion: Int = 0
+    @State private var animationAmount = 0.0
+    @State private var isAnimating = false
+    @State private var scaleAmount = 1.5
+    
     var body: some View {
         ZStack {
             
@@ -51,6 +56,13 @@ struct ContentView: View {
                             Image(countries[number])
                                 .clipShape(.capsule)
                                 .shadow(radius: 5)
+                                .opacity(number == tappedQueestion || !isAnimating ? 1 : 0.25)
+                                .scaleEffect(number == tappedQueestion ? scaleAmount : 1)
+                                .rotation3DEffect(.degrees(animationAmount), axis: (x: 0, y: 1, z:0))
+                                .animation( number != tappedQueestion  ? nil : .easeOut(
+                                    duration: 1
+                                )
+                                ,value: scaleAmount)
                         }
                     }
                 }
@@ -58,6 +70,7 @@ struct ContentView: View {
                 .padding(.vertical, 20)
                 .background(.regularMaterial)
                 .clipShape(.rect(cornerRadius: 20))
+                
                 
                 Spacer()
                 Spacer()
@@ -85,6 +98,11 @@ struct ContentView: View {
     }
     
     func flagTapped(_ number: Int){
+        tappedQueestion = number
+        animationAmount += 360
+        isAnimating = true
+        scaleAmount *= 2
+        
         if number == correctAnswer {
             scoreTitle = "Correct"
             usersScore += 1
@@ -99,9 +117,13 @@ struct ContentView: View {
             showingScore = true
 
         }
-    }
+            }
     
     func askQuestion() {
+        tappedQueestion = -1
+        isAnimating = false
+        scaleAmount = 1
+        
         countries = countries.shuffled()
         correctAnswer = Int.random(in: 0...2)
         currentQuestion += 1
